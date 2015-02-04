@@ -1,6 +1,7 @@
 package woonohyo.net.dialogexercise;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -38,27 +39,59 @@ public class MainActivity extends ActionBarActivity implements DialogInterface.O
         textViewAge = (TextView) findViewById(R.id.textView_age);
     }
 
+    private ProgressDialog dlg;
+
+    public class LoadThread extends Thread {
+        int progress = 0;
+
+        @Override
+        public void run() {
+            while (progress < 101) {
+                dlg.setProgress(progress);
+                ++progress;
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+
     void showDialog() {
+
+        dlg = new ProgressDialog(this);
+        dlg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dlg.setMessage("Fucking...");
+        dlg.show();
+
+        LoadThread thread = new LoadThread();
+        thread.start();
+
+        /*
         LinearLayout lay = (LinearLayout) View.inflate(this, R.layout.laydlg, null);
         AlertDialog.Builder dlg = new AlertDialog.Builder(this);
         editTextAge = (EditText) lay.findViewById(R.id.editText_age);
         editTextName = (EditText) lay.findViewById(R.id.editText_name);
         dlg.setTitle("THIS IS TITLE!");
         dlg.setView(lay);
+        dlg.setIcon(R.drawable.ic_launcher);
         dlg.setPositiveButton("Input!", this);
         dlg.setNegativeButton("Cancel!", this);
         dlg.show();
+        */
     }
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
         Toast.makeText(this, which + " Clicked", Toast.LENGTH_SHORT).show();
         switch (which) {
-            case -1: {
+            case DialogInterface.BUTTON_POSITIVE: {
                 textViewAge.setText(editTextAge.getText().toString());
                 textViewName.setText(editTextName.getText().toString());
             }
-            case -2: {
+            case DialogInterface.BUTTON_NEGATIVE: {
                 editTextAge.setText("");
                 editTextName.setText("");
             }
